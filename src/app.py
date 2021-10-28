@@ -7,10 +7,14 @@ load_dotenv()
 
 from config import *
 
+from routes.auth import auth_bp
+
 app = Flask(__name__)
 app.config.from_object(DevelopmentConfig)
 CORS(app)
 db.init_app(app)
+
+app.register_blueprint(auth_bp)
 
 @app.route("/")
 def index():
