@@ -33,7 +33,7 @@ def loginUser(request):
         
         if(user is not None):
             if bcrypt.checkpw(request.form['password'].encode('utf-8'), user.password.encode('utf-8')):
-                userToken = generateToken({'id':user.id, 'user':user.username, 'email':user.email})
+                userToken = generateToken({'id':user.id, 'username':user.username, 'email':user.email})
                 print(userToken)
                 return {'status': 200, 'message': 'Login successful', 'token': userToken}, 200
             else:
