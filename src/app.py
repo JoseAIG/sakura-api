@@ -9,6 +9,7 @@ from config import *
 
 from routes.auth import auth_bp
 from routes.user import user_bp
+from routes.manga import manga_bp
 
 app = Flask(__name__)
 app.config.from_object(DevelopmentConfig)
@@ -17,6 +18,7 @@ db.init_app(app)
 
 app.register_blueprint(auth_bp)
 app.register_blueprint(user_bp)
+app.register_blueprint(manga_bp)
 
 @app.route("/")
 def index():
