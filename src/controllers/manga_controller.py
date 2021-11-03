@@ -2,6 +2,7 @@ from flask import request
 from database import db
 from helpers.jwt_tools import authTokenRequired, decodeToken
 from helpers.file_upload import uploadFiles
+from s3 import deleteFile
 from models.manga import Manga
 from models.user import User
 
@@ -89,6 +90,7 @@ def updateManga():
                 manga.chapters = request.form['chapters']
                 changeFlag = True
             if not request.files['cover'].filename == '':
+                deleteFile("covers/", manga.cover_image)
                 manga.cover_image = uploadFiles('cover', 'covers/')[0]
                 changeFlag = True
             # IF CHANGES WERE MADE, COMMIT THEM TO THE DB
@@ -118,6 +120,7 @@ def deleteManga():
             return {'status':400, 'message':'Manga does not exist'}, 400
         # CHECK IF USER CAN EDIT THE MANGA
         if(user.admin or manga.user_id == userID):
+            deleteFile("covers/", manga.cover_image)
             db.session.delete(manga)
             db.session.commit()
             return {'status':200, 'message':'Manga successfully deleted'}, 200
