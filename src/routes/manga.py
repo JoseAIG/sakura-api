@@ -1,18 +1,20 @@
 from flask import Blueprint, request
-from controllers.manga_controller import createManga, getManga
+from controllers.manga_controller import getUserMangas, createManga, updateManga, deleteManga, getManga
 
 
 manga_bp = Blueprint('manga_bp', __name__)
 
 
-@manga_bp.route("/manga", methods=['POST', 'PUT', 'DELETE'])
+@manga_bp.route("/manga", methods=['GET', 'POST', 'PUT', 'DELETE'])
 def manga():
+    if(request.method == 'GET'):
+        return getUserMangas()
     if(request.method == 'POST'):
         return createManga()
     if(request.method == 'PUT'):
-        return {'status':200, 'message':'Operation in process'}, 200
+        return updateManga()
     if(request.method == 'DELETE'):
-        return {'status':200, 'message':'Operation in process'}, 200
+        return deleteManga()
 
 @manga_bp.route("/manga/<id>", methods=['GET'])
 def manga_id(id):

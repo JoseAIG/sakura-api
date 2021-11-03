@@ -7,6 +7,7 @@ class User(db.Model):
     username = db.Column(db.String(60), nullable=False, unique=True)
     email = db.Column(db.String(60), nullable=False, unique=True)
     password = db.Column(db.String(65), nullable=False)
+    admin = db.Column(db.Boolean, nullable=False, default=False)
     date_created = db.Column(db.DateTime, default=datetime.utcnow()-timedelta(hours=4))
     mangas = db.relationship('Manga', cascade="all, delete", backref="usuario")
 
