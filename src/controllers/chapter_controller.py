@@ -2,21 +2,22 @@ from flask import request
 from database import db
 from helpers.jwt_tools import authTokenRequired, decodeToken
 from helpers.file_upload import uploadFiles
-from s3 import deleteFile
 from models.manga import Manga
 from models.chapter import Chapter
+from models.user import User
+from s3 import deleteDirectory
 
 #Getting the chapter info for reading
-def getChapter(chapterID):
+def getChapter(mangaID, number):
     try:
         #Query the chapter info using the identifier provided
-        chapter = Chapter.query.get(chapterID)
+        chapter = Chapter.query.filter_by(manga_id=mangaID, number=number).first()
         return {'status':200, 'chapter_id':chapter.id, 'manga_id':chapter.manga_id, 'number':chapter.number, 'chapter_images':chapter.chapter_images, 'date_created':chapter.date_created.strftime("%d/%m/%Y")},200
     except Exception as e:
         print(e)
         return {'status':500, 'message':'Could not get Chapter'},500
     
-#Getting all mangas chapters using the mangaID
+#Getting all manga chapters using the manga id
 def getMangaChapters(mangaID):
     try:
         #Query the chapters using the provided ID
@@ -32,24 +33,36 @@ def getMangaChapters(mangaID):
         return{'status':500,'message':'Could not get manga chapters'}
 
 @authTokenRequired
-def createChapter():
+def createChapter(mangaID):
     try:
-        mangaID = request.form['mangaID']
+        # GET USER FROM ITS ID STORED IN PROVIDED TOKEN
+        token = request.headers['Authorization'].split(" ")[1]
+        userID = decodeToken(token).get('id')
+        user = User.query.get(userID)
+        # GET MANGA FROM PROVIDED MANGA ID 
         manga = Manga.query.get(mangaID)
-        #If manga exists, chapter upload continues
-        if(manga is None):
-            return {'status':400, 'message':'Manga does not exist, cannot upload chapter'},400
+        if(manga is not None):
+            if(user.admin or manga.user_id == user.id):
+                # CHECK IF CHAPTER ALREADY EXISTS IN MANGA
+                number = request.form['number']
+                chapter = Chapter.query.filter_by(manga_id=mangaID, number=number).first()
+                if(chapter is not None):
+                    return {'status':409, 'message':'Chapter already exists in this manga'},409
+                else:
+                    chapterImagesURL = uploadFiles('images[]','chapters/'+mangaID+'/'+number+'/')
+
+                    newChapter = Chapter(mangaID, number, chapterImagesURL)
+                    db.session.add(newChapter)
+                    db.session.commit()
+
+                    return {'status':200, 'message':'Chapter uploaded successfully'},200
+            else:
+                return {'status':403, 'message':'You do not have permissions for creating this chapter'},403
         else:
-            number = request.form['number']
-            chapterImagesURL = uploadFiles('chapterImages[]','chapters/'+mangaID)
+            return {'status':400, 'message':'Manga does not exist, cannot upload chapter'},400
 
-            newChapter = Chapter(mangaID,number,chapterImagesURL)
-            db.session.add(newChapter)
-            db.session.commit()
-
-            return {'status':200, 'message':'Chapter uploaded successfully'},200
-
-    except Exception:
+    except Exception as e:
+        print(e)
         return {'status':500, 'message':'Could not upload chapter'},500
 
 @authTokenRequired
@@ -77,18 +90,28 @@ def updateChapter():
         return {'status':500, 'message':'Could not update Chapter'}, 500
 
 @authTokenRequired
-def deleteChapter():
+def deleteChapter(mangaID, number):
     try:
-        mangaID = request.form['mangaID']
-        chapterID = request.form['id']
-        chapter = Chapter.query.get(chapterID)
-        #If chapter exists, chapter deletion continues
-        if(chapter is None):
-            return {'status':400, 'message':'Chapter does not exist'},400
+        # GET USER FROM ITS ID STORED IN PROVIDED TOKEN
+        token = request.headers['Authorization'].split(" ")[1]
+        userID = decodeToken(token).get('id')
+        user = User.query.get(userID)
+        # GET MANGA FROM PROVIDED MANGA ID 
+        manga = Manga.query.get(mangaID)
+        # CHECK IF USER CAN DELETE THE CHAPTER
+        if(user.admin or manga.user_id == user.id):
+            # GET CHAPTER FROM PROVIDED CHAPTER ID
+            chapter = Chapter.query.filter_by(manga_id=mangaID, number=number).first()
+            if(chapter is None):
+                return {'status':400, 'message':'Chapter does not exist'},400
+            else:
+                deleteDirectory('chapters/'+mangaID+'/'+number+'/')
+                db.session.delete(chapter)
+                db.session.commit()
+                return {'status':200, 'message':'Chapter successfully deleted'}, 200
         else:
-            #deleteFiles("chapters"+mangaID,'param')
-            db.session.delete(chapter)
-            db.session.commit()
-            return {'status':200, 'message':'Chapter successfully deleted'}, 200
-    except Exception:
+            return {'status':403, 'message':'You do not have permissions for deleting this chapter'},403
+
+    except Exception as e:
+        print(e)
         return {'status':500, 'message':'Could not delete chapter'}, 500

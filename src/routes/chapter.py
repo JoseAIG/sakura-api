@@ -3,18 +3,18 @@ from controllers.chapter_controller import getChapter, getMangaChapters, updateC
 
 chapter_bp = Blueprint('chapter_bp', __name__)
 
-@chapter_bp.route("/<mangaID>/chapters", methods=['GET', 'POST', 'PUT', 'DELETE'])
+@chapter_bp.route("/manga/<mangaID>/chapters", methods=['GET', 'POST', 'PUT'])
 def chapter(mangaID):
     if(request.method == 'GET'):
         return getMangaChapters(mangaID)
     if(request.method == 'POST'):
-        return createChapter()
+        return createChapter(mangaID)
     if(request.method == 'PUT'):
         return updateChapter()
-    if(request.method == 'DELETE'):
-        return deleteChapter()
 
-@chapter_bp.route("/<mangaID>/chapters/<id>", methods=['GET'])
-def chapter_id(id,mangaID):
+@chapter_bp.route("/manga/<mangaID>/chapter/<number>", methods=['GET', 'DELETE'])
+def chapter_id(mangaID, number):
     if(request.method == 'GET'):
-        return getChapter(id)
+        return getChapter(mangaID, number)
+    if(request.method == 'DELETE'):
+        return deleteChapter(mangaID, number)
