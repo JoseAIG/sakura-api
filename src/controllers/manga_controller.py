@@ -22,6 +22,32 @@ def getManga(id):
         print(e)
         return {'status':500, 'message':'Could not get manga'}, 500
 
+def getAllMangas():
+    try:
+        mangas = Manga.query.all()
+        if(mangas is None):
+            return {'status':400, 'message':'No mangas uploaded'}, 400
+        else:
+            allMangas = []
+            for manga in mangas:
+                mangaData = {
+                    "id":manga.id,
+                    "user_id":manga.user_id,
+                    "title":manga.title,
+                    "description":manga.description,
+                    "author":manga.author,
+                    "status":manga.status,
+                    "year":manga.year,
+                    "cover_image":manga.cover_image,
+                    "date_created":manga.date_created,
+                    "chapters":manga.chapters
+                }
+                allMangas.append(mangaData)
+            return(allMangas)
+            
+    except Exception as e:
+        print (e)
+
 @authTokenRequired
 def getUserMangas():
     try:
