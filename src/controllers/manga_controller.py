@@ -5,7 +5,7 @@ from helpers.file_upload import uploadFiles
 from s3 import deleteFile, deleteDirectory
 from models.manga import Manga
 from models.user import User
-
+from operator import itemgetter
 
 def getManga(id):
     try:
@@ -17,6 +17,8 @@ def getManga(id):
             for chapter in manga.chapters:
                 chapterData = {'id':chapter.id, 'manga_id':chapter.manga_id, 'number':chapter.number, 'chapter_images':chapter.chapter_images, 'date_created':chapter.date_created.strftime("%d/%m/%Y")}
                 mangaChapters.append(chapterData)
+            # SORT MANGA CHAPTERS BY THEIR NUMBER (ORDERING THEM)
+            mangaChapters.sort(key=itemgetter("number"))
             return {'status':200, 'manga_id':manga.id, 'user_id':manga.user_id, 'title':manga.title, 'description':manga.description, 'author':manga.author, 'status':manga.status, 'year':manga.year, 'cover_image':manga.cover_image, 'date_created':manga.date_created.strftime("%d/%m/%Y"), 'chapters':mangaChapters}, 200
     except Exception as e:
         print(e)
@@ -30,6 +32,14 @@ def getAllMangas():
         else:
             allMangas = []
             for manga in mangas:
+                # GATHER MANGA CHAPTERS
+                mangaChapters = []
+                for chapter in manga.chapters:
+                    chapterData = {'id':chapter.id, 'manga_id':chapter.manga_id, 'number':chapter.number, 'chapter_images':chapter.chapter_images, 'date_created':chapter.date_created.strftime("%d/%m/%Y")}
+                    mangaChapters.append(chapterData)
+                # SORT MANGA CHAPTERS BY THEIR NUMBER (ORDERING THEM)
+                mangaChapters.sort(key=itemgetter("number"))
+                # BUILD MANGA'S CONTENT
                 mangaData = {
                     "id":manga.id,
                     "user_id":manga.user_id,
@@ -40,13 +50,14 @@ def getAllMangas():
                     "year":manga.year,
                     "cover_image":manga.cover_image,
                     "date_created":manga.date_created,
-                    "chapters":manga.chapters
+                    "chapters":mangaChapters
                 }
                 allMangas.append(mangaData)
-            return(allMangas)
+            return {'status':200, 'all_mangas':allMangas}, 200
             
     except Exception as e:
         print (e)
+        return {'status':500, 'message':'Could not get all mangas'}, 500
 
 @authTokenRequired
 def getUserMangas():
@@ -64,6 +75,8 @@ def getUserMangas():
             for chapter in manga.chapters:
                 chapterData = {'id':chapter.id, 'manga_id':chapter.manga_id, 'number':chapter.number, 'chapter_images':chapter.chapter_images, 'date_created':chapter.date_created.strftime("%d/%m/%Y")}
                 mangaChapters.append(chapterData)
+            # SORT MANGA CHAPTERS BY THEIR NUMBER (ORDERING THEM)
+            mangaChapters.sort(key=itemgetter("number"))
             # POPULATE MANGA DATA
             mangaData = {'manga_id':manga.id, 'user_id':manga.user_id, 'title':manga.title, 'description':manga.description, 'author':manga.author, 'status':manga.status, 'year':manga.year, 'chapters':mangaChapters, 'cover_image':manga.cover_image, 'date_created':manga.date_created.strftime("%d/%m/%Y")}
             userMangaList.append(mangaData)
