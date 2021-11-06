@@ -76,9 +76,13 @@ def updateChapter(mangaID, number):
             return {'status':400, 'message':'Chapter does not exist'},400
         else:
             changeFlag = False
-            if(chapter.number != request.form['number']):
-                chapter.number = request.form['number']
-                changeFlag = True
+            if(chapter.number != int(request.form['number'])):
+                chapterNumber = Chapter.query.filter_by(manga_id=mangaID, number=request.form['number']).first()
+                if(chapterNumber is None ):
+                    chapter.number = request.form['number']
+                    changeFlag = True
+                else:
+                    return {'status':409, 'message':'Chapter already exists in this manga'},409
             if not request.files['images[]'].filename == '':
                 deleteDirectory('chapters/'+mangaID+'/'+number+'/')
                 chapter.chapter_images = uploadFiles('images[]','chapters/'+mangaID+'/'+number+'/')
@@ -87,6 +91,8 @@ def updateChapter(mangaID, number):
             if changeFlag:
                 db.session.commit()
                 return {'status':200, 'message': 'Chapter successfully edited'}, 200
+            else:
+                return {'status':400, 'message':'Data provided is same as current'}, 400
     except Exception:
         return {'status':500, 'message':'Could not update Chapter'}, 500
 
