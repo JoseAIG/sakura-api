@@ -12,6 +12,8 @@ def getChapter(mangaID, number):
     try:
         #Query the chapter info using the identifier provided
         chapter = Chapter.query.filter_by(manga_id=mangaID, number=number).first()
+        if(chapter is None):
+            return {'status':400, 'message':'Chapter does not exist'},400
         return {'status':200, 'chapter_id':chapter.id, 'manga_id':chapter.manga_id, 'number':chapter.number, 'chapter_images':chapter.chapter_images, 'date_created':chapter.date_created.strftime("%d/%m/%Y")},200
     except Exception as e:
         print(e)
@@ -66,11 +68,9 @@ def createChapter(mangaID):
         return {'status':500, 'message':'Could not upload chapter'},500
 
 @authTokenRequired
-def updateChapter():
+def updateChapter(mangaID, number):
     try:
-        mangaID = request.form['mangaID']
-        chapterID = request.form['id']
-        chapter = Chapter.query.get(chapterID)
+        chapter = Chapter.query.filter_by(manga_id=mangaID, number=number).first()
         #If chapter exists, chapter deletion continues
         if(chapter is None):
             return {'status':400, 'message':'Chapter does not exist'},400
@@ -79,8 +79,9 @@ def updateChapter():
             if(chapter.number != request.form['number']):
                 chapter.number = request.form['number']
                 changeFlag = True
-            if not request.files['chapterImages[]'].filename == '':
-                chapter.chapter_images = uploadFiles('chapterImages[]','chapters/'+mangaID)
+            if not request.files['images[]'].filename == '':
+                deleteDirectory('chapters/'+mangaID+'/'+number+'/')
+                chapter.chapter_images = uploadFiles('images[]','chapters/'+mangaID+'/'+number+'/')
                 changeFlag = True
             #Commit if changes were made
             if changeFlag:
