@@ -41,7 +41,7 @@ def getAllMangas():
                 mangaChapters.sort(key=itemgetter("number"))
                 # BUILD MANGA'S CONTENT
                 mangaData = {
-                    "id":manga.id,
+                    "manga_id":manga.id,
                     "user_id":manga.user_id,
                     "title":manga.title,
                     "description":manga.description,
