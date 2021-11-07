@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-from controllers.manga_controller import getAllMangas, getUserMangas, createManga, updateManga, deleteManga, getManga
+from controllers.manga_controller import getAllMangas, getUserMangas, createManga, updateManga, deleteManga, getManga, searchMangas
 
 
 manga_bp = Blueprint('manga_bp', __name__)
@@ -25,3 +25,8 @@ def manga_id(id):
 def allMangas():
     if(request.method == 'GET'):
         return getAllMangas()
+
+@manga_bp.route("/mangas/<keyword>", methods =['GET'])
+def mangasKeyword(keyword):
+    if(request.method == 'GET'):
+        return searchMangas(keyword)
