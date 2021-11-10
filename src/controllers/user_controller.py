@@ -35,7 +35,7 @@ def updateUser():
         # IF CHANGES WERE MADE, COMMIT CHANGES TO DB AND GENERATE A NEW TOKEN
         if changeFlag:
             db.session.commit()
-            userToken = generateToken({'id':user.id, 'username':user.username, 'email':user.email})
+            userToken = generateToken({'id':user.id, 'username':user.username, 'email':user.email, 'admin':user.admin})
             return {'status':200, 'message':'User updated successfully', 'token':userToken}, 200
         else:
             return {'status':400, 'message':'Data provided is same as current'}, 400
