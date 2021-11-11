@@ -13,3 +13,8 @@ def uploadFile(directory: str, filename: str):
 def deleteFile(directory: str, url: str):
     fileKey = directory + url.split("/")[-1]
     s3.delete_object(Bucket=BUCKET_NAME, Key=fileKey)
+
+def deleteDirectory(directory: str):
+    s3 = boto3.resource('s3')
+    bucket = s3.Bucket(BUCKET_NAME)
+    bucket.objects.filter(Prefix=directory).delete()
