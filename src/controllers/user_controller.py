@@ -12,7 +12,7 @@ def getUser():
         token = request.headers['Authorization'].split(" ")[1]
         userID = decodeToken(token).get('id')
         user = User.query.get(userID)
-        return {'status': 200, 'username': user.username, 'email': user.email}, 200
+        return {'status': 200, 'username': user.username, 'email': user.email, 'date_created': user.date_created.strftime("%d/%m/%Y")}, 200
     except Exception as e:
         return {'status': 500, 'message':'Could not get user data'}, 500
 
