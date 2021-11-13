@@ -12,10 +12,12 @@ def getChapterComments(chapterID):
             # GATHER COMMENT REPLIES
             commentReplies = []
             for reply in comment.replies:
-                replyData = {'id': reply.id, 'userID': reply.user_id, 'commentID': reply.comment_id, 'content': reply.content, 'edited': reply.edited, 'dateCreated': reply.date_created.strftime("%d/%m/%Y")}
+                user = User.query.get(reply.user_id)
+                replyData = {'id': reply.id, 'userID': reply.user_id, 'username': user.username, 'commentID': reply.comment_id, 'content': reply.content, 'edited': reply.edited, 'dateCreated': reply.date_created.strftime("%d/%m/%Y")}
                 commentReplies.append(replyData)
             # BUILD COMMENT DATA AND APPENT TO CHAPTER'S COMMENT LIST
-            commentData = {'id': comment.id, 'userID': comment.user_id, 'chapterID': comment.chapter_id, 'content': comment.content, 'edited': comment.edited, 'dateCreated': comment.date_created.strftime("%d/%m/%Y"), 'replies': commentReplies}
+            user = User.query.get(reply.user_id)
+            commentData = {'id': comment.id, 'userID': comment.user_id, 'username': user.username, 'chapterID': comment.chapter_id, 'content': comment.content, 'edited': comment.edited, 'dateCreated': comment.date_created.strftime("%d/%m/%Y"), 'replies': commentReplies}
             chapterComments.append(commentData)
         return {'status': 200, 'chapterComments': chapterComments}, 200
     except Exception:
