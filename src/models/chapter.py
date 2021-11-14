@@ -8,6 +8,7 @@ class Chapter(db.Model):
     number = db.Column(db.Integer, nullable=False)
     chapter_images = db.Column(db.ARRAY(db.String(255)), nullable=True)
     date_created = db.Column(db.DateTime, default=datetime.utcnow()-timedelta(hours=4))
+    comments = db.relationship('Comment', cascade="all, delete", backref="chapter")
 
     #CONSTRUCTOR
     def __init__(self, manga_id, number, chapter_images ):
