@@ -9,6 +9,7 @@ class User(db.Model):
     password = db.Column(db.String(65), nullable=False)
     admin = db.Column(db.Boolean, nullable=False, default=False)
     date_created = db.Column(db.DateTime, default=datetime.utcnow()-timedelta(hours=4))
+    followed_mangas = db.Column(db.Array(db.Integer), nullable=True)
     mangas = db.relationship('Manga', cascade="all, delete", backref="usuario")
 
     # CONSTRUCTOR
