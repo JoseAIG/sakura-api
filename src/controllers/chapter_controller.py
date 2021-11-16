@@ -2,6 +2,7 @@ from flask import request
 from database import db
 from helpers.jwt_tools import authTokenRequired, decodeToken
 from helpers.file_upload import uploadFiles
+from helpers.notifications import sendNotifications
 from models.manga import Manga
 from models.chapter import Chapter
 from models.user import User
@@ -56,6 +57,20 @@ def createChapter(mangaID):
                     newChapter = Chapter(mangaID, number, chapterImagesURL)
                     db.session.add(newChapter)
                     db.session.commit()
+                    
+                    # SEND NOTIFICATION TO USERS
+                    users = User.query.filter(User.followed_mangas.any(int(mangaID))).all()
+                    notificationTokens = []
+                    for user in users:
+                        if(user.notification_token):
+                            notificationTokens.append(user.notification_token)
+                    
+                    sendNotifications(
+                        "New chapter released!",
+                        "Good news, {0} has a new chapter ({1})".format(manga.title, number),
+                        notificationTokens,
+                        {"mangaID": mangaID}
+                    )
 
                     return {'status':200, 'message':'Chapter uploaded successfully'},200
             else:

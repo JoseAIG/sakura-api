@@ -1,7 +1,7 @@
 import bcrypt
 from database import db
 from models.user import User
-from helpers.jwt_tools import generateToken
+from helpers.jwt_tools import authTokenRequired, generateToken, decodeToken
 
 
 def registerUser(request):
@@ -44,3 +44,20 @@ def loginUser(request):
     except Exception as e:
         print(e)
         return {'status': 500, 'message': 'Could not process login'}, 500
+
+@authTokenRequired
+def logoutUser(request):
+    try:
+        # GET USER FROM ITS ID STORED IN PROVIDED TOKEN
+        token = request.headers['Authorization'].split(" ")[1]
+        userID = decodeToken(token).get('id')
+        user = User.query.get(userID)
+
+        # REMOVE USER'S NOTIFICATION TOKEN
+        user.notification_token = None
+        db.session.commit()
+
+        return {'status': 500, 'message': 'Logout successful'}, 500
+    except Exception as e:
+        print(e)
+        return {'status': 500, 'message': 'Could not logout'}, 500

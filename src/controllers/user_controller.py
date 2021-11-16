@@ -77,8 +77,9 @@ def storeNotificationToken():
         user = User.query.get(userID)
 
         # SET USER'S NOTIFICATION TOKEN
-        user.notification_token = request.json['value']
-        db.session.commit()
+        if(user.notification_token != request.json['value']):
+            user.notification_token = request.json['value']
+            db.session.commit()
 
         return {'status':200, 'message':'Token successfully stored'}, 200
     except Exception:

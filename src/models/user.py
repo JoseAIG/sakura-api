@@ -9,7 +9,7 @@ class User(db.Model):
     password = db.Column(db.String(65), nullable=False)
     admin = db.Column(db.Boolean, nullable=False, default=False)
     date_created = db.Column(db.DateTime, default=datetime.utcnow()-timedelta(hours=4))
-    followed_mangas = db.Column(db.ARRAY(db.Integer), nullable=True)
+    followed_mangas = db.Column(db.ARRAY(db.Integer), default = {})
     notification_token = db.Column(db.String(255), nullable=True)
     mangas = db.relationship('Manga', cascade="all, delete", backref="usuario")
     comments = db.relationship('Comment', cascade="all, delete", backref="usuario")
