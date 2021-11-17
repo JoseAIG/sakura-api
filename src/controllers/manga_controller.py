@@ -5,6 +5,7 @@ from helpers.file_upload import uploadFiles
 from s3 import deleteFile, deleteDirectory
 from models.manga import Manga
 from models.user import User
+from models.chapter import Chapter
 from operator import itemgetter
 
 def getManga(id):
@@ -242,6 +243,11 @@ def searchMangas(keyword):
         return {'status':500, 'message':'Could process search'}, 500
 
 def shareMangaTemplate(mangaID, chapterNumber):
-    manga = Manga.query.get(mangaID)
-    print(manga.title)
-    return render_template('manga.html', manga=manga, chapterNumber=chapterNumber)
+    try:
+        manga = Manga.query.get(mangaID)
+        chapter = manga.chapters.filter(Chapter.number == chapterNumber).first()
+        if chapter is None:
+            raise Exception
+        return render_template('manga.html', manga=manga, chapter=chapter)
+    except Exception:
+        return render_template('404.html')
