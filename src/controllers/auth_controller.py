@@ -57,7 +57,7 @@ def logoutUser(request):
         user.notification_token = None
         db.session.commit()
 
-        return {'status': 500, 'message': 'Logout successful'}, 500
+        return {'status': 200, 'message': 'Logout successful'}, 200
     except Exception as e:
         print(e)
         return {'status': 500, 'message': 'Could not logout'}, 500
