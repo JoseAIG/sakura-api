@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Primary Meta Tags -->
+    <title>{{manga.title}}, chapter {{chapterNumber}}</title>
+    <meta name="title" content="{{manga.title}}, chapter {{chapterNumber}}">
+    <meta name="description" content="{{manga.description}}">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://sakura-mv.herokuapp.com/share/{{manga.id}}/chapter/{{chapterNumber}}">
+    <meta property="og:title" content="{{manga.title}}, chapter {{chapterNumber}}">
+    <meta property="og:description" content="{{manga.description}}">
+    <meta property="og:image" content="{{manga.cover_image}}">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://metatags.io/">
+    <meta property="twitter:title" content="{{manga.title}}, chapter {{chapterNumber}}">
+    <meta property="twitter:description" content="{{manga.description}}">
+    <meta property="twitter:image"content="{{manga.cover_image}}">
+</head>
+
+<body>
+    {{manga.title}}, {{chapterNumber}}
+</body>
+
+</html>

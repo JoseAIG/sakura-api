@@ -1,4 +1,4 @@
-from flask import request
+from flask import request, render_template
 from database import db
 from helpers.jwt_tools import authTokenRequired, decodeToken
 from helpers.file_upload import uploadFiles
@@ -240,3 +240,8 @@ def searchMangas(keyword):
     except Exception as e:
         print(e)
         return {'status':500, 'message':'Could process search'}, 500
+
+def shareMangaTemplate(mangaID, chapterNumber):
+    manga = Manga.query.get(mangaID)
+    print(manga.title)
+    return render_template('manga.html', manga=manga, chapterNumber=chapterNumber)
