@@ -12,7 +12,7 @@ class Manga(db.Model):
     year = db.Column(db.Integer, nullable=True)
     cover_image = db.Column(db.String(255), nullable=True)
     date_created = db.Column(db.DateTime, default=datetime.utcnow()-timedelta(hours=4))
-    chapters = db.relationship('Chapter', cascade="all, delete", backref="manga")
+    chapters = db.relationship('Chapter', cascade="all, delete", backref="manga", lazy='dynamic')
 
     # CONSTRUCTOR
     def __init__(self, user_id, title, description, author, status, year, cover_image):

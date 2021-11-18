@@ -12,6 +12,7 @@ from routes.user import user_bp
 from routes.manga import manga_bp
 from routes.chapter import chapter_bp
 from routes.comments import comments_bp
+from routes.follow import follow_bp
 
 app = Flask(__name__)
 app.config.from_object(DevelopmentConfig)
@@ -23,6 +24,7 @@ app.register_blueprint(user_bp)
 app.register_blueprint(manga_bp)
 app.register_blueprint(chapter_bp)
 app.register_blueprint(comments_bp)
+app.register_blueprint(follow_bp)
 
 @app.route("/")
 def index():

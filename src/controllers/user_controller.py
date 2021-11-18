@@ -67,3 +67,20 @@ def deleteUser():
     except Exception as e:
         print(e)
         return {'status':500, 'message':"Could not delete user"}, 500
+
+@authTokenRequired
+def storeNotificationToken():
+    try:
+        # GET USER FROM USER'S JWT
+        token = request.headers['Authorization'].split(" ")[1]
+        userID = decodeToken(token).get('id')
+        user = User.query.get(userID)
+
+        # SET USER'S NOTIFICATION TOKEN
+        if(user.notification_token != request.json['value']):
+            user.notification_token = request.json['value']
+            db.session.commit()
+
+        return {'status':200, 'message':'Token successfully stored'}, 200
+    except Exception:
+        return {'status':500, 'message':"Could not store notification token"}, 500
