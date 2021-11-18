@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-from controllers.auth_controller import registerUser, loginUser
+from controllers.auth_controller import registerUser, loginUser, logoutUser
 
 auth_bp = Blueprint('auth_bp', __name__)
 
@@ -14,3 +14,8 @@ def register():
 def login():
     if(request.method == 'POST'):
         return loginUser(request)
+
+@auth_bp.route('/logout', methods=['POST'])
+def logout():
+    if(request.method == 'POST'):
+        return logoutUser(request)

@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-from controllers.user_controller import getUser, updateUser, deleteUser
+from controllers.user_controller import getUser, updateUser, deleteUser, storeNotificationToken
 
 user_bp = Blueprint('user_bp', __name__)
 
@@ -12,3 +12,8 @@ def user():
         return updateUser()
     if(request.method == 'DELETE'):
         return deleteUser()
+
+@user_bp.route("/user/notifications", methods=['POST'])
+def userNotifications():
+    if(request.method == 'POST'):
+        return storeNotificationToken()
