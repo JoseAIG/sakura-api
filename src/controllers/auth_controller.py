@@ -1,5 +1,6 @@
 import bcrypt
 from database import db
+from helpers.file_upload import uploadFiles
 from models.user import User
 from helpers.jwt_tools import authTokenRequired, generateToken, decodeToken
 
@@ -11,9 +12,14 @@ def registerUser(request):
         password = request.form['password']
         hashedPassword = bcrypt.hashpw(password.encode('utf8'), bcrypt.gensalt()).decode()
 
-        print(username, email, password, hashedPassword)
+        if('picture' in request.files):
+            pictureURL = uploadFiles('picture', 'profile_pictures/')[0]
+        else:
+            pictureURL = None
 
-        newUser = User(username, email, hashedPassword)
+        print(username, email, password, hashedPassword, pictureURL)
+
+        newUser = User(username, email, hashedPassword, pictureURL)
         db.session.add(newUser)
         db.session.commit()
 

@@ -1,3 +1,4 @@
+from operator import itemgetter
 from flask import request
 from helpers.jwt_tools import authTokenRequired, decodeToken
 from database import db
@@ -13,11 +14,13 @@ def getChapterComments(chapterID):
             commentReplies = []
             for reply in comment.replies:
                 user = User.query.get(reply.user_id)
-                replyData = {'id': reply.id, 'userID': reply.user_id, 'username': user.username, 'commentID': reply.comment_id, 'content': reply.content, 'edited': reply.edited, 'dateCreated': reply.date_created.strftime("%d/%m/%Y")}
+                replyData = {'id': reply.id, 'userID': reply.user_id, 'username': user.username, 'userPicture': user.picture, 'commentID': reply.comment_id, 'content': reply.content, 'edited': reply.edited, 'dateCreated': reply.date_created.strftime("%d/%m/%Y")}
                 commentReplies.append(replyData)
-            # BUILD COMMENT DATA AND APPENT TO CHAPTER'S COMMENT LIST
+            # SORT COMMENT REPLIES BY ID
+            commentReplies.sort(key=itemgetter("id"))
+            # BUILD COMMENT DATA AND APPEND TO CHAPTER'S COMMENT LIST
             user = User.query.get(comment.user_id)
-            commentData = {'id': comment.id, 'userID': comment.user_id, 'username': user.username, 'chapterID': comment.chapter_id, 'content': comment.content, 'edited': comment.edited, 'dateCreated': comment.date_created.strftime("%d/%m/%Y"), 'replies': commentReplies}
+            commentData = {'id': comment.id, 'userID': comment.user_id, 'username': user.username, 'userPicture': user.picture, 'chapterID': comment.chapter_id, 'content': comment.content, 'edited': comment.edited, 'dateCreated': comment.date_created.strftime("%d/%m/%Y"), 'replies': commentReplies}
             chapterComments.append(commentData)
         return {'status': 200, 'chapterComments': chapterComments}, 200
     except Exception:

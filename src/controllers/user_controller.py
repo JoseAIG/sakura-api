@@ -1,6 +1,7 @@
 import bcrypt
 from flask import request
 from database import db
+from helpers.file_upload import uploadFiles
 from models.user import User
 from models.manga import Manga
 from helpers.jwt_tools import authTokenRequired, decodeToken, generateToken
@@ -12,7 +13,7 @@ def getUser():
         token = request.headers['Authorization'].split(" ")[1]
         userID = decodeToken(token).get('id')
         user = User.query.get(userID)
-        return {'status': 200, 'username': user.username, 'email': user.email, 'date_created': user.date_created.strftime("%d/%m/%Y")}, 200
+        return {'status': 200, 'username': user.username, 'email': user.email, 'picture': user.picture, 'date_created': user.date_created.strftime("%d/%m/%Y")}, 200
     except Exception as e:
         return {'status': 500, 'message':'Could not get user data'}, 500
 
@@ -31,6 +32,11 @@ def updateUser():
             changeFlag = True
         if request.form['password'] != "":
             user.password = bcrypt.hashpw(request.form['password'].encode('utf8'), bcrypt.gensalt()).decode()
+            changeFlag = True
+        if('picture' in request.files):
+            if(user.picture):
+                deleteFile('profile_pictures/', user.picture)
+            user.picture = uploadFiles('picture', 'profile_pictures/')[0]
             changeFlag = True
         # IF CHANGES WERE MADE, COMMIT CHANGES TO DB AND GENERATE A NEW TOKEN
         if changeFlag:
@@ -54,6 +60,9 @@ def deleteUser():
         token = request.headers['Authorization'].split(" ")[1]
         userID = decodeToken(token).get('id')
         user = User.query.get(userID)
+
+        if(user.picture):
+            deleteFile('profile_pictures/', user.picture)
 
         # GET USER MANGAS AND REMOVE FILES FROM S3
         mangas = Manga.query.filter_by(user_id=userID).all()

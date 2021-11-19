@@ -7,6 +7,7 @@ class User(db.Model):
     username = db.Column(db.String(60), nullable=False, unique=True)
     email = db.Column(db.String(60), nullable=False, unique=True)
     password = db.Column(db.String(65), nullable=False)
+    picture = db.Column(db.String(255), nullable=True, default=None)
     admin = db.Column(db.Boolean, nullable=False, default=False)
     date_created = db.Column(db.DateTime, default=datetime.utcnow()-timedelta(hours=4))
     followed_mangas = db.Column(db.ARRAY(db.Integer), default = {})
@@ -16,7 +17,8 @@ class User(db.Model):
     replies = db.relationship('Reply', cascade="all, delete", backref="usuario")
 
     # CONSTRUCTOR
-    def __init__(self, username, email, password):
+    def __init__(self, username, email, password, pictureURL):
         self.username = username
         self.email = email
         self.password = password
+        self.picture = pictureURL
